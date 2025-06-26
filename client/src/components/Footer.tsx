@@ -1,4 +1,5 @@
 import Logo from './Logo';
+import { Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
 
 export default function Footer() {
   const scrollToSection = (sectionId: string) => {
@@ -52,17 +53,33 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Connect With Us</h4>
             <div className="flex space-x-4">
-              <a href="#" className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}>
-                <div className="w-4 h-4 rounded border" style={{ borderColor: 'hsl(43, 74%, 52%)' }}></div>
+              <a 
+                href="#" 
+                className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-blue-600 hover:border-blue-600 group"
+                style={{ borderColor: 'hsl(43, 74%, 52%)' }}
+              >
+                <Facebook size={18} className="group-hover:text-white" style={{ color: 'hsl(43, 74%, 52%)' }} />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}>
-                <div className="w-4 h-4" style={{ color: 'hsl(43, 74%, 52%)' }}>◇</div>
+              <a 
+                href="#" 
+                className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-pink-600 hover:border-pink-600 group"
+                style={{ borderColor: 'hsl(43, 74%, 52%)' }}
+              >
+                <Instagram size={18} className="group-hover:text-white" style={{ color: 'hsl(43, 74%, 52%)' }} />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}>
-                <div className="w-4 h-4" style={{ color: 'hsl(43, 74%, 52%)' }}>◆</div>
+              <a 
+                href="#" 
+                className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-red-600 hover:border-red-600 group"
+                style={{ borderColor: 'hsl(43, 74%, 52%)' }}
+              >
+                <Youtube size={18} className="group-hover:text-white" style={{ color: 'hsl(43, 74%, 52%)' }} />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}>
-                <div className="w-4 h-4" style={{ color: 'hsl(43, 74%, 52%)' }}>○</div>
+              <a 
+                href="#" 
+                className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-green-600 hover:border-green-600 group"
+                style={{ borderColor: 'hsl(43, 74%, 52%)' }}
+              >
+                <MessageCircle size={18} className="group-hover:text-white" style={{ color: 'hsl(43, 74%, 52%)' }} />
               </a>
             </div>
           </div>
