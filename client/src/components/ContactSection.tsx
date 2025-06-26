@@ -74,7 +74,7 @@ export default function ContactSection() {
               <div className="card-3d p-6 rounded-xl border border-yellow-600/20 hover:border-yellow-600/50 transition-all duration-300" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.3)' }}>
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 gold-gradient rounded-full flex items-center justify-center">
-                    <span style={{ color: 'hsl(216, 47%, 8%)' }}>📞</span>
+                    <div className="w-5 h-5 rounded border-2" style={{ borderColor: 'hsl(216, 47%, 8%)' }}></div>
                   </div>
                   <div>
                     <h4 className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Phone Consultation</h4>
@@ -86,7 +86,7 @@ export default function ContactSection() {
               <div className="card-3d p-6 rounded-xl border border-yellow-600/20 hover:border-yellow-600/50 transition-all duration-300" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.3)' }}>
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 gold-gradient rounded-full flex items-center justify-center">
-                    <span style={{ color: 'hsl(216, 47%, 8%)' }}>✉️</span>
+                    <div className="w-5 h-3 border-2 border-b-0" style={{ borderColor: 'hsl(216, 47%, 8%)' }}></div>
                   </div>
                   <div>
                     <h4 className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Email</h4>
@@ -98,7 +98,9 @@ export default function ContactSection() {
               <div className="card-3d p-6 rounded-xl border border-yellow-600/20 hover:border-yellow-600/50 transition-all duration-300" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.3)' }}>
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 gold-gradient rounded-full flex items-center justify-center">
-                    <span style={{ color: 'hsl(216, 47%, 8%)' }}>🕐</span>
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center" style={{ borderColor: 'hsl(216, 47%, 8%)' }}>
+                      <div className="w-2 h-2" style={{ backgroundColor: 'hsl(216, 47%, 8%)' }}></div>
+                    </div>
                   </div>
                   <div>
                     <h4 className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Consultation Hours</h4>
@@ -277,9 +279,9 @@ export default function ContactSection() {
                   style={{ color: 'hsl(216, 47%, 8%)' }}
                 >
                   {isSubmitting ? (
-                    '✈️ Sending...'
+                    'Sending...'
                   ) : (
-                    '✈️ Send Consultation Request'
+                    'Send Consultation Request'
                   )}
                 </Button>
               </form>

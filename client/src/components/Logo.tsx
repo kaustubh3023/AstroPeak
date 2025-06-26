@@ -15,7 +15,7 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
       <svg
         viewBox="0 0 100 100"
         className="w-full h-full"
-        style={{ filter: 'drop-shadow(0 0 8px rgba(212, 175, 55, 0.3))' }}
+        style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}
       >
         {/* Outer Circle */}
         <circle

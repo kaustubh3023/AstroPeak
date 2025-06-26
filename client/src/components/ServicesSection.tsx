@@ -1,10 +1,27 @@
 import { SERVICES } from '../lib/constants';
+import { BarChart3, Calculator, Smartphone, Type, CreditCard, Edit, Clock, Coins, PenTool } from 'lucide-react';
 
 export default function ServicesSection() {
   const scrollToContact = () => {
     const element = document.getElementById('contact');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const getIcon = (iconName: string) => {
+    const iconProps = { size: 24, className: "text-current" };
+    switch(iconName) {
+      case 'chart': return <BarChart3 {...iconProps} />;
+      case 'calculator': return <Calculator {...iconProps} />;
+      case 'smartphone': return <Smartphone {...iconProps} />;
+      case 'type': return <Type {...iconProps} />;
+      case 'cards': return <CreditCard {...iconProps} />;
+      case 'edit': return <Edit {...iconProps} />;
+      case 'clock': return <Clock {...iconProps} />;
+      case 'coins': return <Coins {...iconProps} />;
+      case 'pen-tool': return <PenTool {...iconProps} />;
+      default: return <BarChart3 {...iconProps} />;
     }
   };
 
@@ -35,7 +52,9 @@ export default function ServicesSection() {
             >
               <div className="text-center space-y-6">
                 <div className="w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-3xl" style={{ color: 'hsl(216, 47%, 8%)' }}>{service.icon}</span>
+                  <div style={{ color: 'hsl(216, 47%, 8%)' }}>
+                    {getIcon(service.icon)}
+                  </div>
                 </div>
                 <h3 className="text-2xl font-display font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>
                   {service.name}
@@ -57,10 +76,10 @@ export default function ServicesSection() {
         <div className="text-center mt-16">
           <button 
             onClick={scrollToContact}
-            className="card-3d gold-gradient px-10 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all duration-300 inline-flex items-center gap-2"
+            className="card-3d gold-gradient px-10 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all duration-300"
             style={{ color: 'hsl(216, 47%, 8%)' }}
           >
-            📅 Book Your Consultation Today
+            Book Your Consultation Today
           </button>
         </div>
       </div>

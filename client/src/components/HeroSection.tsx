@@ -44,12 +44,12 @@ export default function HeroSection() {
         <div className="space-y-8">
           {/* Logo Display */}
           <div className="flex justify-center mb-8">
-            <Logo size="lg" className="animate-glow" />
+            <Logo size="lg" />
           </div>
           
           {/* Main Title */}
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight animate-glow" style={{ color: 'hsl(43, 74%, 52%)' }}>
+            <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight" style={{ color: 'hsl(43, 74%, 52%)' }}>
               <span className="block">Shri Shrree</span>
               <span className="block text-4xl md:text-5xl mt-2" style={{ color: 'hsl(41, 73%, 77%)' }}>Asttro Consultancy</span>
             </h1>
@@ -65,32 +65,32 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
             <button 
               onClick={scrollToServices}
-              className="card-3d gold-gradient px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all duration-300 flex items-center gap-2"
+              className="card-3d gold-gradient px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all duration-300"
               style={{ color: 'hsl(216, 47%, 8%)' }}
             >
-              🔮 Explore Services
+              Explore Services
             </button>
             <button 
               onClick={scrollToContact}
-              className="card-3d border-2 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all duration-300 flex items-center gap-2"
+              className="card-3d border-2 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all duration-300"
               style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}
             >
-              📞 Book Consultation
+              Book Consultation
             </button>
           </div>
           
           {/* Trust Indicators */}
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-12 pt-12 text-sm">
             <div className="flex items-center space-x-2">
-              <span style={{ color: 'hsl(43, 74%, 52%)' }}>👥</span>
+              <div className="w-5 h-5 rounded-full border-2" style={{ borderColor: 'hsl(43, 74%, 52%)' }}></div>
               <span className="text-gray-300">1000+ Happy Clients</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span style={{ color: 'hsl(43, 74%, 52%)' }}>🏆</span>
+              <div className="w-5 h-5" style={{ color: 'hsl(43, 74%, 52%)' }}>◆</div>
               <span className="text-gray-300">15+ Years Experience</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span style={{ color: 'hsl(43, 74%, 52%)' }}>⭐</span>
+              <div className="w-5 h-5" style={{ color: 'hsl(43, 74%, 52%)' }}>◉</div>
               <span className="text-gray-300">Certified Astrologer</span>
             </div>
           </div>

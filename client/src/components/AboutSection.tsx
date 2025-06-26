@@ -30,7 +30,9 @@ export default function AboutSection() {
             <div className="grid grid-cols-2 gap-6">
               <div className="card-3d p-6 rounded-xl border border-yellow-600/20" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.5)' }}>
                 <div className="text-center">
-                  <span className="text-3xl mb-3 block" style={{ color: 'hsl(43, 74%, 52%)' }}>🎓</span>
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full border-2 flex items-center justify-center" style={{ borderColor: 'hsl(43, 74%, 52%)' }}>
+                    <div className="w-6 h-6 rounded border" style={{ borderColor: 'hsl(43, 74%, 52%)' }}></div>
+                  </div>
                   <h4 className="font-semibold mb-2" style={{ color: 'hsl(43, 74%, 52%)' }}>Certified</h4>
                   <p className="text-sm text-gray-300">Vedic Astrology Institute</p>
                 </div>
@@ -38,7 +40,9 @@ export default function AboutSection() {
               
               <div className="card-3d p-6 rounded-xl border border-yellow-600/20" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.5)' }}>
                 <div className="text-center">
-                  <span className="text-3xl mb-3 block" style={{ color: 'hsl(43, 74%, 52%)' }}>👥</span>
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full border-2 flex items-center justify-center" style={{ borderColor: 'hsl(43, 74%, 52%)' }}>
+                    <div className="text-lg" style={{ color: 'hsl(43, 74%, 52%)' }}>◉</div>
+                  </div>
                   <h4 className="font-semibold mb-2" style={{ color: 'hsl(43, 74%, 52%)' }}>1000+</h4>
                   <p className="text-sm text-gray-300">Happy Clients</p>
                 </div>
@@ -59,19 +63,19 @@ export default function AboutSection() {
               {/* Floating Elements */}
               <div className="absolute -top-6 -left-6 animate-float">
                 <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-xl" style={{ color: 'hsl(216, 47%, 8%)' }}>🕉️</span>
+                  <div className="text-xl" style={{ color: 'hsl(216, 47%, 8%)' }}>◉</div>
                 </div>
               </div>
               
               <div className="absolute -bottom-6 -right-6 animate-float" style={{ animationDelay: '1s' }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg" style={{ backgroundColor: 'hsl(258, 43%, 51%)' }}>
-                  <span className="text-white text-xl">☯️</span>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-2" style={{ backgroundColor: 'hsl(258, 43%, 51%)', borderColor: 'hsl(43, 74%, 52%)' }}>
+                  <div className="text-white text-xl">◇</div>
                 </div>
               </div>
               
               <div className="absolute top-4 -right-4 animate-float" style={{ animationDelay: '2s' }}>
-                <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style={{ backgroundColor: 'hsl(217, 91%, 60%)' }}>
-                  <span className="text-white">⭐</span>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg border" style={{ backgroundColor: 'hsl(217, 91%, 60%)', borderColor: 'hsl(43, 74%, 52%)' }}>
+                  <div className="text-white">◆</div>
                 </div>
               </div>
             </div>

@@ -52,17 +52,17 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Connect With Us</h4>
             <div className="flex space-x-4">
-              <a href="#" className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ backgroundColor: 'hsl(236, 45%, 16%)', color: 'hsl(43, 74%, 52%)' }}>
-                📘
+              <a href="#" className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}>
+                <div className="w-4 h-4 rounded border" style={{ borderColor: 'hsl(43, 74%, 52%)' }}></div>
               </a>
-              <a href="#" className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ backgroundColor: 'hsl(236, 45%, 16%)', color: 'hsl(43, 74%, 52%)' }}>
-                📷
+              <a href="#" className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}>
+                <div className="w-4 h-4" style={{ color: 'hsl(43, 74%, 52%)' }}>◇</div>
               </a>
-              <a href="#" className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ backgroundColor: 'hsl(236, 45%, 16%)', color: 'hsl(43, 74%, 52%)' }}>
-                📱
+              <a href="#" className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}>
+                <div className="w-4 h-4" style={{ color: 'hsl(43, 74%, 52%)' }}>◆</div>
               </a>
-              <a href="#" className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ backgroundColor: 'hsl(236, 45%, 16%)', color: 'hsl(43, 74%, 52%)' }}>
-                📺
+              <a href="#" className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110" style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}>
+                <div className="w-4 h-4" style={{ color: 'hsl(43, 74%, 52%)' }}>○</div>
               </a>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="border-t border-yellow-600/20 mt-12 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 Shri Shrree Asttro Consultancy. All rights reserved. | Designed with ❤️ for seekers of cosmic wisdom.
+            © 2024 Shri Shrree Asttro Consultancy. All rights reserved. | Designed for seekers of cosmic wisdom.
           </p>
         </div>
       </div>
