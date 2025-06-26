@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { Phone, Mail, Clock, Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
 
 const contactFormSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -74,7 +75,7 @@ export default function ContactSection() {
               <div className="card-3d p-6 rounded-xl border border-yellow-600/20 hover:border-yellow-600/50 transition-all duration-300" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.3)' }}>
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 gold-gradient rounded-full flex items-center justify-center">
-                    <div className="w-5 h-5 rounded border-2" style={{ borderColor: 'hsl(216, 47%, 8%)' }}></div>
+                    <Phone size={20} style={{ color: 'hsl(216, 47%, 8%)' }} />
                   </div>
                   <div>
                     <h4 className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Phone Consultation</h4>
@@ -86,7 +87,7 @@ export default function ContactSection() {
               <div className="card-3d p-6 rounded-xl border border-yellow-600/20 hover:border-yellow-600/50 transition-all duration-300" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.3)' }}>
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 gold-gradient rounded-full flex items-center justify-center">
-                    <div className="w-5 h-3 border-2 border-b-0" style={{ borderColor: 'hsl(216, 47%, 8%)' }}></div>
+                    <Mail size={20} style={{ color: 'hsl(216, 47%, 8%)' }} />
                   </div>
                   <div>
                     <h4 className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Email</h4>
@@ -98,14 +99,47 @@ export default function ContactSection() {
               <div className="card-3d p-6 rounded-xl border border-yellow-600/20 hover:border-yellow-600/50 transition-all duration-300" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.3)' }}>
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 gold-gradient rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center" style={{ borderColor: 'hsl(216, 47%, 8%)' }}>
-                      <div className="w-2 h-2" style={{ backgroundColor: 'hsl(216, 47%, 8%)' }}></div>
-                    </div>
+                    <Clock size={20} style={{ color: 'hsl(216, 47%, 8%)' }} />
                   </div>
                   <div>
                     <h4 className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Consultation Hours</h4>
                     <p className="text-gray-300">Mon-Sun: 9:00 AM - 8:00 PM</p>
                   </div>
+                </div>
+              </div>
+              
+              {/* Social Media Links */}
+              <div className="card-3d p-6 rounded-xl border border-yellow-600/20 hover:border-yellow-600/50 transition-all duration-300" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.3)' }}>
+                <h4 className="font-semibold mb-4" style={{ color: 'hsl(43, 74%, 52%)' }}>Follow Us</h4>
+                <div className="flex space-x-4">
+                  <a 
+                    href="#" 
+                    className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-blue-600 hover:border-blue-600 group"
+                    style={{ borderColor: 'hsl(43, 74%, 52%)' }}
+                  >
+                    <Facebook size={18} className="group-hover:text-white" style={{ color: 'hsl(43, 74%, 52%)' }} />
+                  </a>
+                  <a 
+                    href="#" 
+                    className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-pink-600 hover:border-pink-600 group"
+                    style={{ borderColor: 'hsl(43, 74%, 52%)' }}
+                  >
+                    <Instagram size={18} className="group-hover:text-white" style={{ color: 'hsl(43, 74%, 52%)' }} />
+                  </a>
+                  <a 
+                    href="#" 
+                    className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-red-600 hover:border-red-600 group"
+                    style={{ borderColor: 'hsl(43, 74%, 52%)' }}
+                  >
+                    <Youtube size={18} className="group-hover:text-white" style={{ color: 'hsl(43, 74%, 52%)' }} />
+                  </a>
+                  <a 
+                    href="#" 
+                    className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-green-600 hover:border-green-600 group"
+                    style={{ borderColor: 'hsl(43, 74%, 52%)' }}
+                  >
+                    <MessageCircle size={18} className="group-hover:text-white" style={{ color: 'hsl(43, 74%, 52%)' }} />
+                  </a>
                 </div>
               </div>
             </div>
