@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import Logo from './Logo';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,32 +34,7 @@ export default function Navigation() {
           {/* Logo Section */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 relative">
-                {/* Lotus flower representation */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl animate-pulse-gold" style={{ color: 'hsl(43, 74%, 52%)' }}>🪷</span>
-                </div>
-                {/* Radiating lines */}
-                <div className="absolute inset-0 animate-spin-slow">
-                  <div className="w-full h-full relative">
-                    <div className="absolute top-0 left-1/2 w-0.5 h-2 transform -translate-x-1/2" style={{ backgroundColor: 'hsl(43, 74%, 52%)' }}></div>
-                    <div className="absolute top-1 right-1 w-0.5 h-1.5 transform rotate-45" style={{ backgroundColor: 'hsl(43, 74%, 52%)' }}></div>
-                    <div className="absolute right-0 top-1/2 w-2 h-0.5 transform -translate-y-1/2" style={{ backgroundColor: 'hsl(43, 74%, 52%)' }}></div>
-                    <div className="absolute bottom-1 right-1 w-0.5 h-1.5 transform -rotate-45" style={{ backgroundColor: 'hsl(43, 74%, 52%)' }}></div>
-                    <div className="absolute bottom-0 left-1/2 w-0.5 h-2 transform -translate-x-1/2" style={{ backgroundColor: 'hsl(43, 74%, 52%)' }}></div>
-                    <div className="absolute bottom-1 left-1 w-0.5 h-1.5 transform rotate-45" style={{ backgroundColor: 'hsl(43, 74%, 52%)' }}></div>
-                    <div className="absolute left-0 top-1/2 w-2 h-0.5 transform -translate-y-1/2" style={{ backgroundColor: 'hsl(43, 74%, 52%)' }}></div>
-                    <div className="absolute top-1 left-1 w-0.5 h-1.5 transform -rotate-45" style={{ backgroundColor: 'hsl(43, 74%, 52%)' }}></div>
-                  </div>
-                </div>
-                {/* Moon and Star elements */}
-                <div className="absolute -left-3 top-2">
-                  <span className="text-xs" style={{ color: 'hsl(41, 73%, 77%)' }}>🌙</span>
-                </div>
-                <div className="absolute -right-2 top-1">
-                  <span className="text-xs" style={{ color: 'hsl(41, 73%, 77%)' }}>⭐</span>
-                </div>
-              </div>
+              <Logo size="md" className="animate-pulse-gold" />
               <div>
                 <h1 className="text-xl font-display font-bold" style={{ color: 'hsl(43, 74%, 52%)' }}>SSCS</h1>
                 <p className="text-xs -mt-1" style={{ color: 'hsl(41, 73%, 77%)' }}>Shri Shrree Asttro Consultancy</p>

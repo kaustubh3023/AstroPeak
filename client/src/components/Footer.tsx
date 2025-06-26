@@ -1,3 +1,5 @@
+import Logo from './Logo';
+
 export default function Footer() {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -13,11 +15,7 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xl" style={{ color: 'hsl(43, 74%, 52%)' }}>🪷</span>
-                </div>
-              </div>
+              <Logo size="sm" />
               <div>
                 <h3 className="text-lg font-display font-bold" style={{ color: 'hsl(43, 74%, 52%)' }}>SSCS</h3>
                 <p className="text-xs -mt-1" style={{ color: 'hsl(41, 73%, 77%)' }}>Shri Shrree Asttro Consultancy</p>

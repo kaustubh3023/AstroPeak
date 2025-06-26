@@ -27,11 +27,10 @@ export default function ServicesSection() {
           {SERVICES.map((service, index) => (
             <div 
               key={service.id}
-              className="card-3d bg-gradient-to-br p-8 rounded-2xl border border-yellow-600/20 hover:border-yellow-600/50 transition-all duration-500 group opacity-0 translate-y-5"
+              className="card-3d bg-gradient-to-br p-8 rounded-2xl border border-yellow-600/20 hover:border-yellow-600/50 transition-all duration-500 group animate-fade-in-up"
               style={{ 
                 background: `linear-gradient(135deg, hsl(236, 45%, 16%) 0%, hsl(216, 47%, 8%) 100%)`,
-                animationDelay: `${index * 0.1}s`,
-                animation: 'fadeInUp 0.6s ease forwards'
+                animationDelay: `${index * 0.1}s`
               }}
             >
               <div className="text-center space-y-6">
@@ -66,14 +65,7 @@ export default function ServicesSection() {
         </div>
       </div>
       
-      <style jsx>{`
-        @keyframes fadeInUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+
     </section>
   );
 }

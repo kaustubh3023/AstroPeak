@@ -1,6 +1,7 @@
 import { ChevronDown } from 'lucide-react';
 import FloatingElements from './3d/FloatingElements';
 import ThreeBackground from './3d/ThreeBackground';
+import Logo from './Logo';
 
 export default function HeroSection() {
   const scrollToServices = () => {
@@ -41,6 +42,11 @@ export default function HeroSection() {
       {/* Hero Content */}
       <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
         <div className="space-y-8">
+          {/* Logo Display */}
+          <div className="flex justify-center mb-8">
+            <Logo size="lg" className="animate-glow" />
+          </div>
+          
           {/* Main Title */}
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight animate-glow" style={{ color: 'hsl(43, 74%, 52%)' }}>
