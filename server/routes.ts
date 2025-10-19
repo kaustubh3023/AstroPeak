@@ -129,32 +129,38 @@ export async function registerRoutes(app: Express) {
   });
 
   // ===== SERVICE REQUEST =====
-  app.post("/api/service-request", async (req: Request, res: Response) => {
-    const data: ServiceFormData & { uid: string } = req.body;
-    if (!data.uid || !data.firstName || !data.lastName || !data.email || !data.phone || !data.serviceName)
-      return res.status(400).json({ message: "Missing required fields or not logged in" });
+  // ===== SERVICE REQUEST =====
+app.post("/api/service-request", async (req: Request, res: Response) => {
+  const data: ServiceFormData & { uid: string } = req.body;
+  if (!data.uid || !data.firstName || !data.lastName || !data.email || !data.phone || !data.serviceName)
+    return res.status(400).json({ message: "Missing required fields or not logged in" });
 
-    try {
-      const user = await db.select().from(users).where(eq(users.uid, data.uid)).limit(1);
-      if (!user.length) return res.status(403).json({ message: "User must be logged in" });
+  try {
+    const user = await db.select().from(users).where(eq(users.uid, data.uid)).limit(1);
+    if (!user.length) return res.status(403).json({ message: "User must be logged in" });
 
-      await db.insert(serviceRequests).values({
-        uid: data.uid,
-        name: `${data.firstName} ${data.lastName}`,
-        phone: data.phone,
-        serviceType: data.serviceName,
-        message: data.specificQuestions || "No additional questions provided",
-        createdAt: new Date(),
-      });
+    // Save service request to DB
+    await db.insert(serviceRequests).values({
+      uid: data.uid,
+      name: `${data.firstName} ${data.lastName}`,
+      phone: data.phone,
+      serviceType: data.serviceName,
+      message: data.specificQuestions || "No additional questions provided",
+      createdAt: new Date(),
+    });
 
-      const result = await sendServiceRequestEmail(data);
-      if (result.success) return res.status(201).json({ message: "Service booked successfully!", success: true });
-      res.status(500).json({ message: "Service booked but failed to send confirmation email", success: false });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error while processing service request" });
-    }
-  });
+    // Try sending email, but don't block booking
+    sendServiceRequestEmail(data).catch(err => {
+      console.warn("⚠️ Email sending failed, booking is saved:", err);
+    });
+
+    res.status(201).json({ message: "Service booked successfully!", success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error while processing service request" });
+  }
+});
+
 
   // ===== ADMIN ROUTES =====
   const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
