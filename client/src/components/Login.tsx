@@ -111,7 +111,7 @@ const Login: React.FC = () => {
 
         // Send to backend
         
-        const response = await fetch("http://localhost:5500/api/users", {
+        const response = await fetch("https://astropeak.onrender.com/api/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ uid, phone, email: email.trim() || undefined }),
