@@ -1,5 +1,6 @@
 import Logo from './Logo';
 import { Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
+import { useLocation } from 'wouter';
 
 export default function Footer() {
   const scrollToSection = (sectionId: string) => {
@@ -8,6 +9,7 @@ export default function Footer() {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+  const [, navigate] = useLocation();
 
   return (
     <footer className="border-t border-yellow-600/20 py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: 'hsl(216, 47%, 8%)' }}>
@@ -34,14 +36,17 @@ export default function Footer() {
               <button onClick={() => scrollToSection('home')} className="block text-gray-400 hover:text-yellow-500 transition-colors duration-300">
                 Home
               </button>
-              <button onClick={() => scrollToSection('services')} className="block text-gray-400 hover:text-yellow-500 transition-colors duration-300">
-                Services
+              <button onClick={() => navigate('/profile')} className="block text-gray-400 hover:text-yellow-500 transition-colors duration-300">
+                Profile
               </button>
               <button onClick={() => scrollToSection('about')} className="block text-gray-400 hover:text-yellow-500 transition-colors duration-300">
                 About
               </button>
               <button onClick={() => scrollToSection('testimonials')} className="block text-gray-400 hover:text-yellow-500 transition-colors duration-300">
                 Testimonials
+              </button>
+              <button onClick={() => scrollToSection('service-selection')} className="block text-gray-400 hover:text-yellow-500 transition-colors duration-300">
+                Book Services
               </button>
               <button onClick={() => scrollToSection('contact')} className="block text-gray-400 hover:text-yellow-500 transition-colors duration-300">
                 Contact
@@ -88,7 +93,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="border-t border-yellow-600/20 mt-12 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 Shri Shrree Asttro Consultancy. All rights reserved. | Designed for seekers of cosmic wisdom.
+            © 2025 Shri Shrree Asttro Consultancy. All rights reserved. | Designed for seekers of cosmic wisdom.
           </p>
         </div>
       </div>

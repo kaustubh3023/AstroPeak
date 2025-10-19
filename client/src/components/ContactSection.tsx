@@ -42,16 +42,36 @@ export default function ContactSection() {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Consultation Request Sent!",
-      description: "Thank you for your consultation request! We will contact you within 24 hours.",
-    });
-    
-    form.reset();
-    setIsSubmitting(false);
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        toast({
+          title: "Feedback or Suggestions Sent",
+          description: "Thank you for your feedback or suggestions! We will review it and get back to you within 24 hours.",
+        });
+        form.reset();
+      } else {
+        throw new Error(result.message || 'Failed to send message');
+      }
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send your message. Please try again later or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -213,84 +233,15 @@ export default function ContactSection() {
                     </FormItem>
                   )}
                 />
-                
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>
-                        Phone Number *
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="tel"
-                          placeholder="Enter your phone number"
-                          {...field}
-                          className="bg-mystic-navy/50 border-yellow-600/30 text-gray-100 focus:border-yellow-500"
-                          style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.5)', borderColor: 'hsla(43, 74%, 52%, 0.3)' }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="service"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>
-                        Service of Interest
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="bg-mystic-navy/50 border-yellow-600/30 text-gray-100" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.5)', borderColor: 'hsla(43, 74%, 52%, 0.3)' }}>
-                            <SelectValue placeholder="Select a service" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="vedic-astrology">Vedic Astrology</SelectItem>
-                          <SelectItem value="numerology">Numerology Analysis</SelectItem>
-                          <SelectItem value="tarot">Tarot Reading</SelectItem>
-                          <SelectItem value="name-correction">Name Correction</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="birthDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>
-                        Birth Date
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          {...field}
-                          className="bg-mystic-navy/50 border-yellow-600/30 text-gray-100 focus:border-yellow-500"
-                          style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.5)', borderColor: 'hsla(43, 74%, 52%, 0.3)' }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
+
+               
                 <FormField
                   control={form.control}
                   name="message"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>
-                        Your Message
+                        Your Feedback or Suggestions
                       </FormLabel>
                       <FormControl>
                         <Textarea
@@ -315,7 +266,7 @@ export default function ContactSection() {
                   {isSubmitting ? (
                     'Sending...'
                   ) : (
-                    'Send Consultation Request'
+                    'Give Your Feedback'
                   )}
                 </Button>
               </form>

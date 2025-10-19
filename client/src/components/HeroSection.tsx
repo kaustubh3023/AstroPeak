@@ -4,8 +4,8 @@ import ThreeBackground from './3d/ThreeBackground';
 import Logo from './Logo';
 
 export default function HeroSection() {
-  const scrollToServices = () => {
-    const element = document.getElementById('services');
+  const scrollToServiceSelection = () => {
+    const element = document.getElementById('service-selection');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
@@ -51,31 +51,31 @@ export default function HeroSection() {
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight" style={{ color: 'hsl(43, 74%, 52%)' }}>
               <span className="block">Shri Shrree</span>
-              <span className="block text-4xl md:text-5xl mt-2" style={{ color: 'hsl(41, 73%, 77%)' }}>Asttro Consultancy</span>
+              <span className="block text-4xl md:text-5xl mt-2" style={{ color: 'hsl(43, 74%, 52%)' }}>Asttro Consultancy</span>
             </h1>
             <div className="w-32 h-1 gold-gradient mx-auto rounded-full"></div>
           </div>
           
           {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-black font-light leading-relaxed max-w-2xl mx-auto">
             Unlock the mysteries of your destiny through ancient Vedic wisdom, numerology, and tarot guidance
           </p>
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
             <button 
-              onClick={scrollToServices}
+              onClick={scrollToServiceSelection}
               className="card-3d gold-gradient px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all duration-300"
               style={{ color: 'hsl(216, 47%, 8%)' }}
             >
-              Explore Services
+              Book Services
             </button>
             <button 
               onClick={scrollToContact}
               className="card-3d border-2 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all duration-300"
               style={{ borderColor: 'hsl(43, 74%, 52%)', color: 'hsl(43, 74%, 52%)' }}
             >
-              Book Consultation
+              Contact Us
             </button>
           </div>
           
@@ -83,15 +83,15 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-12 pt-12 text-sm">
             <div className="flex items-center space-x-2">
               <div className="w-5 h-5 rounded-full border-2" style={{ borderColor: 'hsl(43, 74%, 52%)' }}></div>
-              <span className="text-gray-300">1000+ Happy Clients</span>
+              <span className="text-black">1000+ Happy Clients</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-5 h-5" style={{ color: 'hsl(43, 74%, 52%)' }}>◆</div>
-              <span className="text-gray-300">15+ Years Experience</span>
+              <span className="text-black">15+ Years Experience</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-5 h-5" style={{ color: 'hsl(43, 74%, 52%)' }}>◉</div>
-              <span className="text-gray-300">Certified Astrologer</span>
+              <span className="text-black">Certified Astrologer</span>
             </div>
           </div>
         </div>

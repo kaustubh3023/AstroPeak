@@ -1,6 +1,6 @@
 export default function AboutSection() {
   return (
-    <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black to-mystic-navy" style={{ background: 'linear-gradient(to bottom, hsl(216, 47%, 8%) 0%, hsl(236, 45%, 16%) 100%)' }}>
+    <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black to-mystic-navy" style={{ background: 'linear-gradient(to bottom, hsl(0, 0.00%, 100.00%) 0%, hsl(0, 0.00%, 100.00%) 100%)' }}>
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Content Side */}
@@ -12,7 +12,7 @@ export default function AboutSection() {
               <div className="w-24 h-1 gold-gradient rounded-full mb-8"></div>
             </div>
             
-            <div className="space-y-6 text-gray-300 leading-relaxed text-lg">
+            <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
               <p>
                 With over 15 years of dedicated study and practice in Vedic astrology, numerology, and tarot reading, Shri Shrree Asttro Consultancy has guided thousands of individuals toward clarity, purpose, and prosperity.
               </p>
@@ -28,7 +28,7 @@ export default function AboutSection() {
             
             {/* Credentials */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="card-3d p-6 rounded-xl border border-yellow-600/20" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.5)' }}>
+              <div className="card-3d p-6 rounded-xl border border-yellow-600/20" style={{ backgroundColor: 'hsl(235, 45.70%, 15.90%)' }}>
                 <div className="text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-full border-2 flex items-center justify-center" style={{ borderColor: 'hsl(43, 74%, 52%)' }}>
                     <div className="w-6 h-6 rounded border" style={{ borderColor: 'hsl(43, 74%, 52%)' }}></div>
@@ -38,7 +38,7 @@ export default function AboutSection() {
                 </div>
               </div>
               
-              <div className="card-3d p-6 rounded-xl border border-yellow-600/20" style={{ backgroundColor: 'hsla(236, 45%, 16%, 0.5)' }}>
+              <div className="card-3d p-6 rounded-xl border border-yellow-600/20" style={{ backgroundColor: 'hsl(235, 45.70%, 15.90%)' }}>
                 <div className="text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-full border-2 flex items-center justify-center" style={{ borderColor: 'hsl(43, 74%, 52%)' }}>
                     <div className="text-lg" style={{ color: 'hsl(43, 74%, 52%)' }}>◉</div>

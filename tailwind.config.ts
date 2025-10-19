@@ -61,6 +61,11 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        'batraa-navy': '#1a1a2e',    // deep navy/purple
+        'batraa-gold': '#ffd700',    // bright gold
+        'batraa-white': '#ffffff',   // pure white
+        'batraa-dark': '#333333',    // dark gray
+        'batraa-light-gray': '#f8f9fa', // light gray
       },
       keyframes: {
         "accordion-down": {
