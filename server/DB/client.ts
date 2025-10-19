@@ -16,9 +16,14 @@ if (!DB_HOST || !DB_USER || !DB_PASS || !DB_NAME || !DB_CA_PATH) {
 }
 
 // Read SSL CA certificate
-const sslCA = fs.readFileSync(DB_CA_PATH, "utf-8");
+let sslCA: string;
+try {
+  sslCA = fs.readFileSync(DB_CA_PATH, "utf-8");
+} catch (err) {
+  throw new Error(`Failed to read DB_CA_PATH file at ${DB_CA_PATH}: ${err}`);
+}
 
-// Create MySQL pool with SSL
+// Create MySQL pool with SSL (required for TiDB Cloud)
 const pool = mysql.createPool({
   host: DB_HOST,
   user: DB_USER,
@@ -34,10 +39,11 @@ const pool = mysql.createPool({
 // Test DB connection
 (async () => {
   try {
-    await pool.query("SELECT 1");
-    console.log("🌟 Database connection successful!");
+    const [rows] = await pool.query("SELECT 1");
+    console.log("✅ Database connection successful!", rows);
   } catch (err) {
     console.error("❌ Database connection failed:", err);
+    process.exit(1); // stop the server if DB connection fails
   }
 })();
 
