@@ -5,7 +5,7 @@ import { createServer as createViteServer, createLogger } from "vite";
 import { fileURLToPath } from "url";
 import { nanoid } from "nanoid";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
+import viteConfig from "D:/AstroWeb/AstroPeak/vite.config";
 
 // ===== Helpers =====
 const viteLogger = createLogger();
