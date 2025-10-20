@@ -1,62 +1,33 @@
 import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { adminApi, type LoginCredentials } from '@/lib/adminApi';
-import { toast } from '@/hooks/use-toast';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
 }
 
 export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
-  const [credentials, setCredentials] = useState<LoginCredentials>({
-    username: '',
-    password: '',
-  });
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-
-  const loginMutation = useMutation({
-    mutationFn: adminApi.login,
-    onSuccess: (data) => {
-      if (data.success) {
-        toast({ title: 'Login successful!' });
-        onLoginSuccess();
-      } else {
-        setError('Invalid credentials');
-      }
-    },
-    onError: (error) => {
-      setError('Login failed. Please check your credentials.');
-      toast({ title: 'Login failed', variant: 'destructive' });
-    },
-  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    if (!credentials.username || !credentials.password) {
-      setError('Please enter both username and password');
-      return;
+
+    // Simple hardcoded check
+    if (username === 'neeraj' && password === 'admin123') {
+      toast({ title: 'Login successful!' });
+      onLoginSuccess();
+    } else {
+      setError('Invalid username or password');
     }
-
-    loginMutation.mutate(credentials);
-  };
-
-  const handleInputChange = (field: keyof LoginCredentials) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setCredentials(prev => ({
-      ...prev,
-      [field]: e.target.value,
-    }));
-    if (error) setError(''); // Clear error when user starts typing
   };
 
   return (
@@ -81,10 +52,9 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                   id="username"
                   type="text"
                   placeholder="Enter username"
-                  value={credentials.username}
-                  onChange={handleInputChange('username')}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="pl-10"
-                  disabled={loginMutation.isPending}
                 />
               </div>
             </div>
@@ -97,10 +67,9 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter password"
-                  value={credentials.password}
-                  onChange={handleInputChange('password')}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10"
-                  disabled={loginMutation.isPending}
                 />
                 <button
                   type="button"
@@ -118,12 +87,8 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               </Alert>
             )}
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loginMutation.isPending}
-            >
-              {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
+            <Button type="submit" className="w-full">
+              Sign In
             </Button>
           </form>
 

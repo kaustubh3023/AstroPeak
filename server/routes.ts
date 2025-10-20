@@ -1,4 +1,4 @@
-import type { Express, Request, Response, NextFunction } from "express";
+import type { Express, Request, Response } from "express";
 import { db } from "./DB/client";
 import { users, serviceRequests, type User, type ServiceRequest } from "../shared/schema";
 import { eq, count } from "drizzle-orm";
@@ -10,19 +10,7 @@ import {
   type ServiceFormData,
 } from "./emailService";
 
-// Extend Express session
-declare module 'express-session' {
-  interface SessionData {
-    isAdmin?: boolean;
-  }
-}
-
-// Admin authentication middleware
-const adminAuth = (req: Request, res: Response, next: NextFunction) => {
-  if (req.session?.isAdmin) return next();
-  res.status(401).json({ error: "Unauthorized" });
-};
-
+// ===== REGISTER ROUTES =====
 export async function registerRoutes(app: Express) {
   // ===== DB connection check =====
   (async () => {
@@ -158,31 +146,26 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // ===== ADMIN ROUTES =====
+  // ===== ADMIN ROUTES (SIMPLE LOGIN) =====
   const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
+  // Login
   app.post("/api/admin/login", (req: Request, res: Response) => {
     const { username, password } = req.body;
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      req.session.isAdmin = true;
       return res.json({ message: "Login successful", success: true });
     }
     res.status(401).json({ message: "Invalid credentials", success: false });
   });
 
-  app.post("/api/admin/logout", (req: Request, res: Response) => {
-    req.session.destroy(err => {
-      if (err) return res.status(500).json({ error: "Could not log out" });
-      res.json({ message: "Logged out successfully" });
-    });
+  // Check admin status (frontend handles state)
+  app.get("/api/admin/status", (_req: Request, res: Response) => {
+    res.json({ isAdmin: true });
   });
 
-  app.get("/api/admin/status", (req: Request, res: Response) => {
-    res.json({ isAdmin: !!req.session?.isAdmin });
-  });
-
-  app.get("/api/admin/users", adminAuth, async (_req: Request, res: Response) => {
+  // Get all users
+  app.get("/api/admin/users", async (_req: Request, res: Response) => {
     try {
       const allUsers: User[] = await db.select().from(users);
       res.json(allUsers);
@@ -192,7 +175,8 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.get("/api/admin/requests", adminAuth, async (_req: Request, res: Response) => {
+  // Get all service requests
+  app.get("/api/admin/requests", async (_req: Request, res: Response) => {
     try {
       const allRequests: ServiceRequest[] = await db.select().from(serviceRequests);
       res.json(allRequests);
@@ -202,9 +186,11 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.patch("/api/admin/requests/:id/status", adminAuth, async (req: Request, res: Response) => {
+  // Update request status
+  app.patch("/api/admin/requests/:id/status", async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status } = req.body;
+
     if (!status || !['queued', 'fulfilled', 'cancelled'].includes(status))
       return res.status(400).json({ error: "Invalid status" });
 
@@ -220,7 +206,8 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/requests/:id", adminAuth, async (req: Request, res: Response) => {
+  // Delete request
+  app.delete("/api/admin/requests/:id", async (req: Request, res: Response) => {
     const requestId = Number(req.params.id);
     if (isNaN(requestId)) return res.status(400).json({ error: "Invalid ID" });
 
@@ -233,7 +220,8 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.get("/api/admin/stats", adminAuth, async (_req: Request, res: Response) => {
+  // Get admin stats
+  app.get("/api/admin/stats", async (_req: Request, res: Response) => {
     try {
       const [usersResult] = await db.select({ count: count() }).from(users);
       const [requestsResult] = await db.select({ count: count() }).from(serviceRequests);
