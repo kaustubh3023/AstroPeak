@@ -10,9 +10,8 @@ import {
   type ServiceFormData,
 } from "./emailService";
 
-// ===== REGISTER ROUTES =====
 export async function registerRoutes(app: Express) {
-  // ===== DB connection check =====
+  // ===== Check DB connection =====
   (async () => {
     try {
       await db.execute("SELECT 1");
@@ -23,9 +22,9 @@ export async function registerRoutes(app: Express) {
   })();
 
   // ===== USER ROUTES =====
-  app.get("/api/users", async (_req: Request, res: Response) => {
+  app.get("/api/users", async (_req, res) => {
     try {
-      const allUsers: User[] = await db.select().from(users);
+      const allUsers = await db.select().from(users);
       res.json(allUsers);
     } catch (err) {
       console.error(err);
@@ -33,7 +32,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.get("/api/users/:uid", async (req: Request, res: Response) => {
+  app.get("/api/users/:uid", async (req, res) => {
     const { uid } = req.params;
     try {
       const result = await db.select().from(users).where(eq(users.uid, uid)).limit(1);
@@ -45,7 +44,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.post("/api/users", async (req: Request, res: Response) => {
+  app.post("/api/users", async (req, res) => {
     const { uid, phone, email } = req.body;
     if (!uid || !phone) return res.status(400).json({ message: "uid and phone are required" });
 
@@ -70,7 +69,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.patch("/api/users/:uid", async (req: Request, res: Response) => {
+  app.patch("/api/users/:uid", async (req, res) => {
     const { uid } = req.params;
     const { name, gender, age, dob, zodiacSign, email } = req.body;
 
@@ -101,7 +100,7 @@ export async function registerRoutes(app: Express) {
   });
 
   // ===== CONTACT FORM =====
-  app.post("/api/contact", async (req: Request, res: Response) => {
+  app.post("/api/contact", async (req, res) => {
     const data: ContactFormData = req.body;
     if (!data.firstName || !data.lastName || !data.email || !data.phone)
       return res.status(400).json({ message: "Missing required fields" });
@@ -117,7 +116,7 @@ export async function registerRoutes(app: Express) {
   });
 
   // ===== SERVICE REQUEST =====
-  app.post("/api/service-request", async (req: Request, res: Response) => {
+  app.post("/api/service-request", async (req, res) => {
     const data: ServiceFormData & { uid: string } = req.body;
     if (!data.uid || !data.firstName || !data.lastName || !data.email || !data.phone || !data.serviceName)
       return res.status(400).json({ message: "Missing required fields or not logged in" });
@@ -150,8 +149,8 @@ export async function registerRoutes(app: Express) {
   const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
-  // Login
-  app.post("/api/admin/login", (req: Request, res: Response) => {
+  // LOGIN (no cookies, no session)
+  app.post("/api/admin/login", (req, res) => {
     const { username, password } = req.body;
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       return res.json({ message: "Login successful", success: true });
@@ -159,13 +158,13 @@ export async function registerRoutes(app: Express) {
     res.status(401).json({ message: "Invalid credentials", success: false });
   });
 
-  // Check admin status (frontend handles state)
-  app.get("/api/admin/status", (_req: Request, res: Response) => {
+  // STATUS (always true if frontend stores admin flag)
+  app.get("/api/admin/status", (_req, res) => {
     res.json({ isAdmin: true });
   });
 
-  // Get all users
-  app.get("/api/admin/users", async (_req: Request, res: Response) => {
+  // USERS LIST
+  app.get("/api/admin/users", async (_req, res) => {
     try {
       const allUsers: User[] = await db.select().from(users);
       res.json(allUsers);
@@ -175,8 +174,8 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // Get all service requests
-  app.get("/api/admin/requests", async (_req: Request, res: Response) => {
+  // REQUESTS LIST
+  app.get("/api/admin/requests", async (_req, res) => {
     try {
       const allRequests: ServiceRequest[] = await db.select().from(serviceRequests);
       res.json(allRequests);
@@ -186,11 +185,10 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // Update request status
-  app.patch("/api/admin/requests/:id/status", async (req: Request, res: Response) => {
+  // UPDATE REQUEST STATUS
+  app.patch("/api/admin/requests/:id/status", async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
-
     if (!status || !['queued', 'fulfilled', 'cancelled'].includes(status))
       return res.status(400).json({ error: "Invalid status" });
 
@@ -206,8 +204,8 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // Delete request
-  app.delete("/api/admin/requests/:id", async (req: Request, res: Response) => {
+  // DELETE REQUEST
+  app.delete("/api/admin/requests/:id", async (req, res) => {
     const requestId = Number(req.params.id);
     if (isNaN(requestId)) return res.status(400).json({ error: "Invalid ID" });
 
@@ -220,8 +218,8 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // Get admin stats
-  app.get("/api/admin/stats", async (_req: Request, res: Response) => {
+  // ADMIN STATS
+  app.get("/api/admin/stats", async (_req, res) => {
     try {
       const [usersResult] = await db.select({ count: count() }).from(users);
       const [requestsResult] = await db.select({ count: count() }).from(serviceRequests);

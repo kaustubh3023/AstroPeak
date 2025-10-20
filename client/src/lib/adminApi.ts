@@ -39,62 +39,46 @@ const defaultHeaders = {
   'Content-Type': 'application/json',
 };
 
-// Use direct URL to backend server to avoid proxy issues
+// Use your backend domain here
 const API_BASE = 'https://astropeak.onrender.com';
 
 export const adminApi = {
+  // Simple username + password login
   async login(credentials: LoginCredentials): Promise<{ message: string; success: boolean }> {
     const response = await fetch(`${API_BASE}/api/admin/login`, {
       method: 'POST',
       headers: defaultHeaders,
       body: JSON.stringify(credentials),
-      credentials: 'include',
     });
+
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Failed to login: ${errorText}`);
+      throw new Error(`Login failed: ${errorText}`);
     }
+
     return response.json();
   },
 
-  async logout(): Promise<{ message: string }> {
-    const response = await fetch(`${API_BASE}/api/admin/logout`, {
-      method: 'POST',
-      headers: defaultHeaders,
-      credentials: 'include',
-    });
-    if (!response.ok) throw new Error('Failed to logout');
-    return response.json();
-  },
-
+  // You don’t need logout/status if there’s no cookie/session,
+  // but keeping these for frontend UI consistency is fine
   async checkStatus(): Promise<{ isAdmin: boolean }> {
-    const response = await fetch(`${API_BASE}/api/admin/status`, {
-      credentials: 'include',
-    });
-    if (!response.ok) throw new Error('Failed to check status');
-    return response.json();
+    return { isAdmin: true }; // Always true once logged in
   },
 
   async getStats(): Promise<AdminStats> {
-    const response = await fetch(`${API_BASE}/api/admin/stats`, {
-      credentials: 'include',
-    });
+    const response = await fetch(`${API_BASE}/api/admin/stats`);
     if (!response.ok) throw new Error('Failed to fetch stats');
     return response.json();
   },
 
   async getUsers(): Promise<User[]> {
-    const response = await fetch(`${API_BASE}/api/admin/users`, {
-      credentials: 'include',
-    });
+    const response = await fetch(`${API_BASE}/api/admin/users`);
     if (!response.ok) throw new Error('Failed to fetch users');
     return response.json();
   },
 
   async getRequests(): Promise<ServiceRequest[]> {
-    const response = await fetch(`${API_BASE}/api/admin/requests`, {
-      credentials: 'include',
-    });
+    const response = await fetch(`${API_BASE}/api/admin/requests`);
     if (!response.ok) throw new Error('Failed to fetch requests');
     return response.json();
   },
@@ -104,7 +88,6 @@ export const adminApi = {
       method: 'PATCH',
       headers: defaultHeaders,
       body: JSON.stringify({ status }),
-      credentials: 'include',
     });
     if (!response.ok) throw new Error('Failed to update request status');
   },
@@ -112,7 +95,6 @@ export const adminApi = {
   async deleteRequest(id: number): Promise<void> {
     const response = await fetch(`${API_BASE}/api/admin/requests/${id}`, {
       method: 'DELETE',
-      credentials: 'include',
     });
     if (!response.ok) throw new Error('Failed to delete request');
   },
