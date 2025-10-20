@@ -129,38 +129,34 @@ export async function registerRoutes(app: Express) {
   });
 
   // ===== SERVICE REQUEST =====
-  // ===== SERVICE REQUEST =====
-app.post("/api/service-request", async (req: Request, res: Response) => {
-  const data: ServiceFormData & { uid: string } = req.body;
-  if (!data.uid || !data.firstName || !data.lastName || !data.email || !data.phone || !data.serviceName)
-    return res.status(400).json({ message: "Missing required fields or not logged in" });
+  app.post("/api/service-request", async (req: Request, res: Response) => {
+    const data: ServiceFormData & { uid: string } = req.body;
+    if (!data.uid || !data.firstName || !data.lastName || !data.email || !data.phone || !data.serviceName)
+      return res.status(400).json({ message: "Missing required fields or not logged in" });
 
-  try {
-    const user = await db.select().from(users).where(eq(users.uid, data.uid)).limit(1);
-    if (!user.length) return res.status(403).json({ message: "User must be logged in" });
+    try {
+      const user = await db.select().from(users).where(eq(users.uid, data.uid)).limit(1);
+      if (!user.length) return res.status(403).json({ message: "User must be logged in" });
 
-    // Save service request to DB
-    await db.insert(serviceRequests).values({
-      uid: data.uid,
-      name: `${data.firstName} ${data.lastName}`,
-      phone: data.phone,
-      serviceType: data.serviceName,
-      message: data.specificQuestions || "No additional questions provided",
-      createdAt: new Date(),
-    });
+      await db.insert(serviceRequests).values({
+        uid: data.uid,
+        name: `${data.firstName} ${data.lastName}`,
+        phone: data.phone,
+        serviceType: data.serviceName,
+        message: data.specificQuestions || "No additional questions provided",
+        createdAt: new Date(),
+      });
 
-    // Try sending email, but don't block booking
-    sendServiceRequestEmail(data).catch(err => {
-      console.warn("⚠️ Email sending failed, booking is saved:", err);
-    });
+      sendServiceRequestEmail(data).catch(err => {
+        console.warn("⚠️ Email sending failed, booking is saved:", err);
+      });
 
-    res.status(201).json({ message: "Service booked successfully!", success: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal server error while processing service request" });
-  }
-});
-
+      res.status(201).json({ message: "Service booked successfully!", success: true });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error while processing service request" });
+    }
+  });
 
   // ===== ADMIN ROUTES =====
   const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
@@ -212,8 +208,11 @@ app.post("/api/service-request", async (req: Request, res: Response) => {
     if (!status || !['queued', 'fulfilled', 'cancelled'].includes(status))
       return res.status(400).json({ error: "Invalid status" });
 
+    const requestId = Number(id);
+    if (isNaN(requestId)) return res.status(400).json({ error: "Invalid ID" });
+
     try {
-      await db.update(serviceRequests).set({ status, updatedAt: new Date() }).where(eq(serviceRequests.id, parseInt(id)));
+      await db.update(serviceRequests).set({ status, updatedAt: new Date() }).where(eq(serviceRequests.id, requestId));
       res.json({ message: "Request status updated successfully" });
     } catch (err) {
       console.error(err);
@@ -222,9 +221,11 @@ app.post("/api/service-request", async (req: Request, res: Response) => {
   });
 
   app.delete("/api/admin/requests/:id", adminAuth, async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const requestId = Number(req.params.id);
+    if (isNaN(requestId)) return res.status(400).json({ error: "Invalid ID" });
+
     try {
-      await db.delete(serviceRequests).where(eq(serviceRequests.id, parseInt(id)));
+      await db.delete(serviceRequests).where(eq(serviceRequests.id, requestId));
       res.json({ message: "Request deleted successfully" });
     } catch (err) {
       console.error(err);

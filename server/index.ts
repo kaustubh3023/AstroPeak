@@ -4,6 +4,10 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// ---------------------
+// JSON + URL encoded
+// ---------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -13,7 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://shrishrreeasttro.com";
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", FRONTEND_URL); // must not be '*'
+  res.header("Access-Control-Allow-Origin", FRONTEND_URL); // exact origin, not '*'
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Headers",
@@ -24,9 +28,7 @@ app.use((req, res, next) => {
     "GET, POST, PUT, DELETE, PATCH, OPTIONS"
   );
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
+  if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
 });
 
@@ -35,14 +37,14 @@ app.use((req, res, next) => {
 // ---------------------
 app.use(
   session({
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: process.env.NODE_ENV === "production", // true in prod with HTTPS
+      secure: process.env.NODE_ENV === "production", // HTTPS only in prod
       httpOnly: true,
-      sameSite: "none", // required for cross-origin cookies
-      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "none", // allow cross-origin cookies
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     },
     name: "connect.sid",
   })
@@ -69,11 +71,7 @@ app.use((req, res, next) => {
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
+      if (logLine.length > 80) logLine = logLine.slice(0, 79) + "…";
       log(logLine);
     }
   });
@@ -88,14 +86,12 @@ app.use((req, res, next) => {
   await registerRoutes(app);
 
   // Global error handler
-  app.use(
-    (err: any, _req: Request, res: Response, _next: NextFunction) => {
-      const status = err.status || err.statusCode || 500;
-      const message = err.message || "Internal Server Error";
-      res.status(status).json({ message });
-      throw err;
-    }
-  );
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({ message });
+    throw err;
+  });
 
   // Setup Vite in development
   if (app.get("env") === "development") {
