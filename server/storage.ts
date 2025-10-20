@@ -37,7 +37,8 @@ export class MemStorage implements IStorage {
       gender: null,
       age: null,
       dob: null,
-      zodiacSign: null
+      zodiacSign: null,
+      uid: insertUser.uid ?? null
     };
     this.users.set(id, user);
     return user;
