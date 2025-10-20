@@ -40,7 +40,7 @@ const defaultHeaders = {
 };
 
 // Use direct URL to backend server to avoid proxy issues
-const API_BASE = 'https://astropeak.vercel.app';
+const API_BASE = 'https://shrishrreeasttro.com';
 
 export const adminApi = {
   async login(credentials: LoginCredentials): Promise<{ message: string; success: boolean }> {
