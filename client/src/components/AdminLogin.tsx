@@ -1,33 +1,62 @@
 import React, { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Lock, User, Eye, EyeOff } from 'lucide-react';
+import { adminApi, type LoginCredentials } from '@/lib/adminApi';
 import { toast } from '@/hooks/use-toast';
+import { Lock, User, Eye, EyeOff } from 'lucide-react';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
 }
 
 export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [credentials, setCredentials] = useState<LoginCredentials>({
+    username: '',
+    password: 'admin123',
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  const loginMutation = useMutation({
+    mutationFn: adminApi.login,
+    onSuccess: (data) => {
+      if (data.success) {
+        toast({ title: 'Login successful!' });
+        onLoginSuccess();
+      } else {
+        setError('Invalid credentials');
+      }
+    },
+    onError: (error) => {
+      setError('Login failed. Please check your credentials.');
+      toast({ title: 'Login failed', variant: 'destructive' });
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    // Simple hardcoded check
-    if (username === 'neeraj' && password === 'admin123') {
-      toast({ title: 'Login successful!' });
-      onLoginSuccess();
-    } else {
-      setError('Invalid username or password');
+    
+    if (!credentials.username || !credentials.password) {
+      setError('Please enter both username and password');
+      return;
     }
+
+    loginMutation.mutate(credentials);
+  };
+
+  const handleInputChange = (field: keyof LoginCredentials) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setCredentials(prev => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+    if (error) setError(''); // Clear error when user starts typing
   };
 
   return (
@@ -52,9 +81,10 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                   id="username"
                   type="text"
                   placeholder="Enter username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={credentials.username}
+                  onChange={handleInputChange('username')}
                   className="pl-10"
+                  disabled={loginMutation.isPending}
                 />
               </div>
             </div>
@@ -67,9 +97,10 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={credentials.password}
+                  onChange={handleInputChange('password')}
                   className="pl-10 pr-10"
+                  disabled={loginMutation.isPending}
                 />
                 <button
                   type="button"
@@ -87,15 +118,19 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               </Alert>
             )}
 
-            <Button type="submit" className="w-full">
-              Sign In
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loginMutation.isPending}
+            >
+              {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
 
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <h4 className="font-medium text-blue-900 mb-2">Default Credentials:</h4>
             <div className="text-sm text-blue-700 space-y-1">
-              <p><strong>Username:</strong> neeraj</p>
+              <p><strong>Username:</strong> admin</p>
               <p><strong>Password:</strong> admin123</p>
             </div>
           </div>
