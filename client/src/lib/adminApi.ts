@@ -40,7 +40,7 @@ const defaultHeaders = {
 };
 
 // Use direct URL to backend server to avoid proxy issues
-const API_BASE = 'https://shrishrreeasttro.com';
+const API_BASE = 'https://astropeak.onrender.com';
 
 export const adminApi = {
   async login(credentials: LoginCredentials): Promise<{ message: string; success: boolean }> {
