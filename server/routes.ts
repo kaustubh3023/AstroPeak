@@ -163,7 +163,7 @@ app.post("/api/service-request", async (req: Request, res: Response) => {
 
 
   // ===== ADMIN ROUTES =====
-  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
   app.post("/api/admin/login", (req: Request, res: Response) => {
