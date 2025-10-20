@@ -15,8 +15,8 @@ interface AdminLoginProps {
 
 export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
   const [credentials, setCredentials] = useState<LoginCredentials>({
-    username: '',
-    password: '',
+    username: 'admin',
+    password: 'admin123',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
