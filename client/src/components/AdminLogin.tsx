@@ -119,14 +119,6 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
-
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <h4 className="font-medium text-blue-900 mb-2">Default Credentials:</h4>
-            <div className="text-sm text-blue-700 space-y-1">
-              <p><strong>Username:</strong> admin</p>
-              <p><strong>Password:</strong> admin123</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

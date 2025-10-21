@@ -49,11 +49,11 @@ export default function Navigation() {
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-2">
                 <Phone size={16} className="text-yellow-500" />
-                <span className="text-white text-sm">7065731251</span>
+                <span className="text-white text-sm">9105029933</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Mail size={16} className="text-yellow-500" />
-                <span className="text-white text-sm">thebatraanumerology@gmail.com</span>
+                <span className="text-white text-sm">shrishrree@gmail.com</span>
               </div>
             </div>
           </div>
