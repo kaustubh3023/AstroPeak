@@ -10,9 +10,10 @@ app.use(express.urlencoded({ extended: false }));
 // ---------------------
 // CORS configuration
 // ---------------------
-const FRONTEND_URL = process.env.FRONTEND_URL || "*"; // Set your deployed frontend URL in Render env vars
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://shrishrreeasttro.com";
+
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", FRONTEND_URL);
+  res.header("Access-Control-Allow-Origin", FRONTEND_URL); // must not be '*'
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Headers",
@@ -24,27 +25,24 @@ app.use((req, res, next) => {
   );
 
   if (req.method === "OPTIONS") {
-    res.sendStatus(200);
-  } else {
-    next();
+    return res.sendStatus(200);
   }
+  next();
 });
 
 // ---------------------
-// Session configuration
+// Session middleware
 // ---------------------
 app.use(
   session({
-    secret:
-      process.env.SESSION_SECRET ||
-      "your-secret-key-change-in-production",
+    secret: process.env.SESSION_SECRET!,
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: process.env.NODE_ENV === "production", // true in prod
+      secure: process.env.NODE_ENV === "production", // true in prod with HTTPS
       httpOnly: true,
+      sameSite: "none", // required for cross-origin cookies
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "lax",
     },
     name: "connect.sid",
   })
@@ -94,7 +92,6 @@ app.use((req, res, next) => {
     (err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
-
       res.status(status).json({ message });
       throw err;
     }
@@ -110,10 +107,8 @@ app.use((req, res, next) => {
   // ---------------------
   // Bind server to Render port
   // ---------------------
- const port = parseInt(process.env.PORT || "5500", 10);
-
-app.listen(port, () => {
-  log(`🌟 AstroPeak backend running on port ${port}`);
-});
-
+  const port = parseInt(process.env.PORT || "5500", 10);
+  app.listen(port, () => {
+    log(`🌟 AstroPeak backend running on port ${port}`);
+  });
 })();

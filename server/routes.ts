@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./DB/client";
 import { users, serviceRequests, type User, type ServiceRequest } from "../shared/schema";
 import { eq, count } from "drizzle-orm";
@@ -10,8 +10,21 @@ import {
   type ServiceFormData,
 } from "./emailService";
 
+// Extend Express session
+declare module 'express-session' {
+  interface SessionData {
+    isAdmin?: boolean;
+  }
+}
+
+// Admin authentication middleware
+const adminAuth = (req: Request, res: Response, next: NextFunction) => {
+  if (req.session?.isAdmin) return next();
+  res.status(401).json({ error: "Unauthorized" });
+};
+
 export async function registerRoutes(app: Express) {
-  // ===== Check DB connection =====
+  // ===== DB connection check =====
   (async () => {
     try {
       await db.execute("SELECT 1");
@@ -22,9 +35,9 @@ export async function registerRoutes(app: Express) {
   })();
 
   // ===== USER ROUTES =====
-  app.get("/api/users", async (_req, res) => {
+  app.get("/api/users", async (_req: Request, res: Response) => {
     try {
-      const allUsers = await db.select().from(users);
+      const allUsers: User[] = await db.select().from(users);
       res.json(allUsers);
     } catch (err) {
       console.error(err);
@@ -32,7 +45,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.get("/api/users/:uid", async (req, res) => {
+  app.get("/api/users/:uid", async (req: Request, res: Response) => {
     const { uid } = req.params;
     try {
       const result = await db.select().from(users).where(eq(users.uid, uid)).limit(1);
@@ -44,7 +57,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.post("/api/users", async (req, res) => {
+  app.post("/api/users", async (req: Request, res: Response) => {
     const { uid, phone, email } = req.body;
     if (!uid || !phone) return res.status(400).json({ message: "uid and phone are required" });
 
@@ -69,7 +82,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.patch("/api/users/:uid", async (req, res) => {
+  app.patch("/api/users/:uid", async (req: Request, res: Response) => {
     const { uid } = req.params;
     const { name, gender, age, dob, zodiacSign, email } = req.body;
 
@@ -100,7 +113,7 @@ export async function registerRoutes(app: Express) {
   });
 
   // ===== CONTACT FORM =====
-  app.post("/api/contact", async (req, res) => {
+  app.post("/api/contact", async (req: Request, res: Response) => {
     const data: ContactFormData = req.body;
     if (!data.firstName || !data.lastName || !data.email || !data.phone)
       return res.status(400).json({ message: "Missing required fields" });
@@ -116,55 +129,64 @@ export async function registerRoutes(app: Express) {
   });
 
   // ===== SERVICE REQUEST =====
-  app.post("/api/service-request", async (req, res) => {
-    const data: ServiceFormData & { uid: string } = req.body;
-    if (!data.uid || !data.firstName || !data.lastName || !data.email || !data.phone || !data.serviceName)
-      return res.status(400).json({ message: "Missing required fields or not logged in" });
+  // ===== SERVICE REQUEST =====
+app.post("/api/service-request", async (req: Request, res: Response) => {
+  const data: ServiceFormData & { uid: string } = req.body;
+  if (!data.uid || !data.firstName || !data.lastName || !data.email || !data.phone || !data.serviceName)
+    return res.status(400).json({ message: "Missing required fields or not logged in" });
 
-    try {
-      const user = await db.select().from(users).where(eq(users.uid, data.uid)).limit(1);
-      if (!user.length) return res.status(403).json({ message: "User must be logged in" });
+  try {
+    const user = await db.select().from(users).where(eq(users.uid, data.uid)).limit(1);
+    if (!user.length) return res.status(403).json({ message: "User must be logged in" });
 
-      await db.insert(serviceRequests).values({
-        uid: data.uid,
-        name: `${data.firstName} ${data.lastName}`,
-        phone: data.phone,
-        serviceType: data.serviceName,
-        message: data.specificQuestions || "No additional questions provided",
-        createdAt: new Date(),
-      });
+    // Save service request to DB
+    await db.insert(serviceRequests).values({
+      uid: data.uid,
+      name: `${data.firstName} ${data.lastName}`,
+      phone: data.phone,
+      serviceType: data.serviceName,
+      message: data.specificQuestions || "No additional questions provided",
+      createdAt: new Date(),
+    });
 
-      sendServiceRequestEmail(data).catch(err => {
-        console.warn("⚠️ Email sending failed, booking is saved:", err);
-      });
+    // Try sending email, but don't block booking
+    sendServiceRequestEmail(data).catch(err => {
+      console.warn("⚠️ Email sending failed, booking is saved:", err);
+    });
 
-      res.status(201).json({ message: "Service booked successfully!", success: true });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error while processing service request" });
-    }
-  });
+    res.status(201).json({ message: "Service booked successfully!", success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error while processing service request" });
+  }
+});
 
-  // ===== ADMIN ROUTES (SIMPLE LOGIN) =====
+
+  // ===== ADMIN ROUTES =====
   const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
-  // LOGIN (no cookies, no session)
-  app.post("/api/admin/login", (req, res) => {
+  app.post("/api/admin/login", (req: Request, res: Response) => {
     const { username, password } = req.body;
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      req.session.isAdmin = true;
       return res.json({ message: "Login successful", success: true });
     }
     res.status(401).json({ message: "Invalid credentials", success: false });
   });
 
-  // STATUS (always true if frontend stores admin flag)
-  app.get("/api/admin/status", (_req, res) => {
-    res.json({ isAdmin: true });
+  app.post("/api/admin/logout", (req: Request, res: Response) => {
+    req.session.destroy(err => {
+      if (err) return res.status(500).json({ error: "Could not log out" });
+      res.json({ message: "Logged out successfully" });
+    });
   });
 
-  // USERS LIST
-  app.get("/api/admin/users", async (_req, res) => {
+  app.get("/api/admin/status", (req: Request, res: Response) => {
+    res.json({ isAdmin: !!req.session?.isAdmin });
+  });
+
+  app.get("/api/admin/users", adminAuth, async (_req: Request, res: Response) => {
     try {
       const allUsers: User[] = await db.select().from(users);
       res.json(allUsers);
@@ -174,8 +196,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // REQUESTS LIST
-  app.get("/api/admin/requests", async (_req, res) => {
+  app.get("/api/admin/requests", adminAuth, async (_req: Request, res: Response) => {
     try {
       const allRequests: ServiceRequest[] = await db.select().from(serviceRequests);
       res.json(allRequests);
@@ -185,18 +206,14 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // UPDATE REQUEST STATUS
-  app.patch("/api/admin/requests/:id/status", async (req, res) => {
+  app.patch("/api/admin/requests/:id/status", adminAuth, async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status } = req.body;
     if (!status || !['queued', 'fulfilled', 'cancelled'].includes(status))
       return res.status(400).json({ error: "Invalid status" });
 
-    const requestId = Number(id);
-    if (isNaN(requestId)) return res.status(400).json({ error: "Invalid ID" });
-
     try {
-      await db.update(serviceRequests).set({ status, updatedAt: new Date() }).where(eq(serviceRequests.id, requestId));
+      await db.update(serviceRequests).set({ status, updatedAt: new Date() }).where(eq(serviceRequests.id, parseInt(id)));
       res.json({ message: "Request status updated successfully" });
     } catch (err) {
       console.error(err);
@@ -204,13 +221,10 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // DELETE REQUEST
-  app.delete("/api/admin/requests/:id", async (req, res) => {
-    const requestId = Number(req.params.id);
-    if (isNaN(requestId)) return res.status(400).json({ error: "Invalid ID" });
-
+  app.delete("/api/admin/requests/:id", adminAuth, async (req: Request, res: Response) => {
+    const { id } = req.params;
     try {
-      await db.delete(serviceRequests).where(eq(serviceRequests.id, requestId));
+      await db.delete(serviceRequests).where(eq(serviceRequests.id, parseInt(id)));
       res.json({ message: "Request deleted successfully" });
     } catch (err) {
       console.error(err);
@@ -218,8 +232,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // ADMIN STATS
-  app.get("/api/admin/stats", async (_req, res) => {
+  app.get("/api/admin/stats", adminAuth, async (_req: Request, res: Response) => {
     try {
       const [usersResult] = await db.select({ count: count() }).from(users);
       const [requestsResult] = await db.select({ count: count() }).from(serviceRequests);
