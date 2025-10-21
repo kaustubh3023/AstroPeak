@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./DB/client";
 import { users, serviceRequests, type User, type ServiceRequest } from "../shared/schema";
-import { eq, count } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import {
   sendContactEmail,
   sendServiceRequestEmail,
@@ -10,18 +10,21 @@ import {
   type ServiceFormData,
 } from "./emailService";
 
-// Extend Express session
-declare module 'express-session' {
-  interface SessionData {
-    isAdmin?: boolean;
-  }
-}
+// ===== ADMIN AUTH HEADERS =====
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
-// Admin authentication middleware
-const adminAuth = (req: Request, res: Response, next: NextFunction) => {
-  if (req.session?.isAdmin) return next();
+// Admin-only actions — check credentials via headers
+function simpleAdminAuth(req: Request, res: Response, next: NextFunction) {
+  const username = req.headers["username"] as string;
+  const password = req.headers["password"] as string;
+
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    return next();
+  }
+
   res.status(401).json({ error: "Unauthorized" });
-};
+}
 
 export async function registerRoutes(app: Express) {
   // ===== DB connection check =====
@@ -128,117 +131,110 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-
   // ===== SERVICE REQUEST =====
-app.post("/api/service-request", async (req: Request, res: Response) => {
-  const data: ServiceFormData & { uid: string } = req.body;
-  if (!data.uid || !data.firstName || !data.lastName || !data.email || !data.phone || !data.serviceName)
-    return res.status(400).json({ message: "Missing required fields or not logged in" });
+  app.post("/api/service-request", async (req: Request, res: Response) => {
+    const data: ServiceFormData & { uid: string } = req.body;
+    if (!data.uid || !data.firstName || !data.lastName || !data.email || !data.phone || !data.serviceName)
+      return res.status(400).json({ message: "Missing required fields or not logged in" });
 
-  try {
-    const user = await db.select().from(users).where(eq(users.uid, data.uid)).limit(1);
-    if (!user.length) return res.status(403).json({ message: "User must be logged in" });
+    try {
+      const user = await db.select().from(users).where(eq(users.uid, data.uid)).limit(1);
+      if (!user.length) return res.status(403).json({ message: "User must be logged in" });
 
-    // Save service request to DB
-    await db.insert(serviceRequests).values({
-      uid: data.uid,
-      name: `${data.firstName} ${data.lastName}`,
-      phone: data.phone,
-      serviceType: data.serviceName,
-      message: data.specificQuestions || "No additional questions provided",
-      createdAt: new Date(),
-    });
+      await db.insert(serviceRequests).values({
+        uid: data.uid,
+        name: `${data.firstName} ${data.lastName}`,
+        phone: data.phone,
+        serviceType: data.serviceName,
+        message: data.specificQuestions || "No additional questions provided",
+        createdAt: new Date(),
+      });
 
-    // Try sending email, but don't block booking
-    sendServiceRequestEmail(data).catch(err => {
-      console.warn("⚠️ Email sending failed, booking is saved:", err);
-    });
+      sendServiceRequestEmail(data).catch(err => {
+        console.warn("⚠️ Email sending failed, booking is saved:", err);
+      });
 
-    res.status(201).json({ message: "Service booked successfully!", success: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal server error while processing service request" });
-  }
-});
-
-
-// ===== ADMIN ROUTES (SIMPLE LOGIN) =====
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
-
-// Simple in-memory admin login
-app.post("/api/admin/login", (req: Request, res: Response) => {
-  const { username, password } = req.body;
-
-  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    // Just respond with success — no cookies or sessions
-    return res.json({
-      message: "Login successful",
-      success: true,
-      isAdmin: true,
-    });
-  }
-
-  res.status(401).json({
-    message: "Invalid credentials",
-    success: false,
+      res.status(201).json({ message: "Service booked successfully!", success: true });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error while processing service request" });
+    }
   });
-});
 
-// Check admin status manually (no sessions)
-app.get("/api/admin/status", (req: Request, res: Response) => {
-  // This endpoint can be removed if you don't need it anymore
-  res.json({ isAdmin: false }); 
-});
+  // ===== ADMIN LOGIN =====
+  app.post("/api/admin/login", (req: Request, res: Response) => {
+    const { username, password } = req.body;
 
-// Admin-only actions — check credentials via headers
-function simpleAdminAuth(req: Request, res: Response, next: NextFunction) {
-  const { username, password } = req.headers;
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      return res.json({
+        message: "Login successful",
+        success: true,
+        isAdmin: true,
+      });
+    }
 
-  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    return next();
-  }
+    res.status(401).json({
+      message: "Invalid credentials",
+      success: false,
+    });
+  });
 
-  res.status(401).json({ error: "Unauthorized" });
-}
+  // ===== ADMIN ROUTES =====
+  app.get("/api/admin/users", simpleAdminAuth, async (_req: Request, res: Response) => {
+    try {
+      const allUsers: User[] = await db.select().from(users);
+      res.json(allUsers);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
 
-// Example: Protect routes using simpleAdminAuth
-app.get("/api/admin/users", simpleAdminAuth, async (_req: Request, res: Response) => {
-  try {
-    const allUsers: User[] = await db.select().from(users);
-    res.json(allUsers);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch users" });
-  }
-});
+  app.get("/api/admin/requests", simpleAdminAuth, async (_req: Request, res: Response) => {
+    try {
+      const allRequests: ServiceRequest[] = await db.select().from(serviceRequests);
+      res.json(allRequests);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch requests" });
+    }
+  });
 
-app.get("/api/admin/requests", simpleAdminAuth, async (_req: Request, res: Response) => {
-  try {
-    const allRequests: ServiceRequest[] = await db.select().from(serviceRequests);
-    res.json(allRequests);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch requests" });
-  }
-});
+  app.patch("/api/admin/requests/:id/status", simpleAdminAuth, async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    if (!status || !["queued", "fulfilled", "cancelled"].includes(status))
+      return res.status(400).json({ error: "Invalid status" });
 
-app.patch("/api/admin/requests/:id/status", simpleAdminAuth, async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  if (!status || !['queued', 'fulfilled', 'cancelled'].includes(status))
-    return res.status(400).json({ error: "Invalid status" });
+    try {
+      await db.update(serviceRequests)
+        .set({ status, updatedAt: new Date() })
+        .where(eq(serviceRequests.id, parseInt(id)));
 
-  try {
-    await db.update(serviceRequests)
-      .set({ status, updatedAt: new Date() })
-      .where(eq(serviceRequests.id, parseInt(id)));
+      res.json({ message: "Request status updated successfully" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to update request status" });
+    }
+  });
 
-    res.json({ message: "Request status updated successfully" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to update request status" });
-  }
-});
+  // ===== ADMIN STATS =====
+  app.get("/api/admin/stats", simpleAdminAuth, async (_req: Request, res: Response) => {
+    try {
+      const totalUsers = await db.select().from(users).execute();
+      const totalRequests = await db.select().from(serviceRequests).execute();
+      const queuedRequests = await db.select().from(serviceRequests).where(eq(serviceRequests.status, "queued")).execute();
+      const fulfilledRequests = await db.select().from(serviceRequests).where(eq(serviceRequests.status, "fulfilled")).execute();
 
+      res.json({
+        totalUsers: totalUsers.length,
+        totalRequests: totalRequests.length,
+        queuedRequests: queuedRequests.length,
+        fulfilledRequests: fulfilledRequests.length,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch admin stats" });
+    }
+  });
 }
