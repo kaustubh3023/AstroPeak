@@ -16,7 +16,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Content-Type, Accept, x-admin-username, x-admin-password"
   );
   res.header(
     "Access-Control-Allow-Methods",
@@ -110,10 +110,9 @@ app.use((req, res, next) => {
   // ---------------------
   // Bind server to Render port
   // ---------------------
- const port = parseInt(process.env.PORT || "5500", 10);
+  const port = parseInt(process.env.PORT || "5500", 10);
 
-app.listen(port, () => {
-  log(`🌟 AstroPeak backend running on port ${port}`);
-});
-
+  app.listen(port, () => {
+    log(`🌟 AstroPeak backend running on port ${port}`);
+  });
 })();
