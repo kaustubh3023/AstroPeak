@@ -1,4 +1,5 @@
 // lib/adminApi.ts
+
 export interface AdminStats {
   totalUsers: number;
   totalRequests: number;
@@ -36,10 +37,8 @@ export interface LoginCredentials {
 
 const API_BASE = 'https://astropeak.onrender.com';
 
-let adminHeaders = {
+let adminHeaders: Record<string, string> = {
   'Content-Type': 'application/json',
-  username: '',
-  password: '',
 };
 
 export function setAdminCredentials(username: string, password: string) {
@@ -49,7 +48,6 @@ export function setAdminCredentials(username: string, password: string) {
 
 export const adminApi = {
   async login(credentials: LoginCredentials) {
-    // Set credentials globally
     setAdminCredentials(credentials.username, credentials.password);
 
     const response = await fetch(`${API_BASE}/api/admin/login`, {
