@@ -128,7 +128,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // ===== SERVICE REQUEST =====
+
   // ===== SERVICE REQUEST =====
 app.post("/api/service-request", async (req: Request, res: Response) => {
   const data: ServiceFormData & { uid: string } = req.body;
@@ -162,92 +162,83 @@ app.post("/api/service-request", async (req: Request, res: Response) => {
 });
 
 
-  // ===== ADMIN ROUTES =====
-  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+// ===== ADMIN ROUTES (SIMPLE LOGIN) =====
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
-  app.post("/api/admin/login", (req: Request, res: Response) => {
-    const { username, password } = req.body;
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      req.session.isAdmin = true;
-      return res.json({ message: "Login successful", success: true });
-    }
-    res.status(401).json({ message: "Invalid credentials", success: false });
-  });
+// Simple in-memory admin login
+app.post("/api/admin/login", (req: Request, res: Response) => {
+  const { username, password } = req.body;
 
-  app.post("/api/admin/logout", (req: Request, res: Response) => {
-    req.session.destroy(err => {
-      if (err) return res.status(500).json({ error: "Could not log out" });
-      res.json({ message: "Logged out successfully" });
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    // Just respond with success — no cookies or sessions
+    return res.json({
+      message: "Login successful",
+      success: true,
+      isAdmin: true,
     });
+  }
+
+  res.status(401).json({
+    message: "Invalid credentials",
+    success: false,
   });
+});
 
-  app.get("/api/admin/status", (req: Request, res: Response) => {
-    res.json({ isAdmin: !!req.session?.isAdmin });
-  });
+// Check admin status manually (no sessions)
+app.get("/api/admin/status", (req: Request, res: Response) => {
+  // This endpoint can be removed if you don't need it anymore
+  res.json({ isAdmin: false }); 
+});
 
-  app.get("/api/admin/users", adminAuth, async (_req: Request, res: Response) => {
-    try {
-      const allUsers: User[] = await db.select().from(users);
-      res.json(allUsers);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to fetch users" });
-    }
-  });
+// Admin-only actions — check credentials via headers
+function simpleAdminAuth(req: Request, res: Response, next: NextFunction) {
+  const { username, password } = req.headers;
 
-  app.get("/api/admin/requests", adminAuth, async (_req: Request, res: Response) => {
-    try {
-      const allRequests: ServiceRequest[] = await db.select().from(serviceRequests);
-      res.json(allRequests);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to fetch requests" });
-    }
-  });
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    return next();
+  }
 
-  app.patch("/api/admin/requests/:id/status", adminAuth, async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { status } = req.body;
-    if (!status || !['queued', 'fulfilled', 'cancelled'].includes(status))
-      return res.status(400).json({ error: "Invalid status" });
+  res.status(401).json({ error: "Unauthorized" });
+}
 
-    try {
-      await db.update(serviceRequests).set({ status, updatedAt: new Date() }).where(eq(serviceRequests.id, parseInt(id)));
-      res.json({ message: "Request status updated successfully" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to update request status" });
-    }
-  });
+// Example: Protect routes using simpleAdminAuth
+app.get("/api/admin/users", simpleAdminAuth, async (_req: Request, res: Response) => {
+  try {
+    const allUsers: User[] = await db.select().from(users);
+    res.json(allUsers);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
 
-  app.delete("/api/admin/requests/:id", adminAuth, async (req: Request, res: Response) => {
-    const { id } = req.params;
-    try {
-      await db.delete(serviceRequests).where(eq(serviceRequests.id, parseInt(id)));
-      res.json({ message: "Request deleted successfully" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to delete request" });
-    }
-  });
+app.get("/api/admin/requests", simpleAdminAuth, async (_req: Request, res: Response) => {
+  try {
+    const allRequests: ServiceRequest[] = await db.select().from(serviceRequests);
+    res.json(allRequests);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch requests" });
+  }
+});
 
-  app.get("/api/admin/stats", adminAuth, async (_req: Request, res: Response) => {
-    try {
-      const [usersResult] = await db.select({ count: count() }).from(users);
-      const [requestsResult] = await db.select({ count: count() }).from(serviceRequests);
-      const [queuedResult] = await db.select({ count: count() }).from(serviceRequests).where(eq(serviceRequests.status, "queued"));
-      const [fulfilledResult] = await db.select({ count: count() }).from(serviceRequests).where(eq(serviceRequests.status, "fulfilled"));
+app.patch("/api/admin/requests/:id/status", simpleAdminAuth, async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!status || !['queued', 'fulfilled', 'cancelled'].includes(status))
+    return res.status(400).json({ error: "Invalid status" });
 
-      res.json({
-        totalUsers: usersResult.count,
-        totalRequests: requestsResult.count,
-        queuedRequests: queuedResult.count,
-        fulfilledRequests: fulfilledResult.count,
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to fetch stats" });
-    }
-  });
+  try {
+    await db.update(serviceRequests)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(serviceRequests.id, parseInt(id)));
+
+    res.json({ message: "Request status updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update request status" });
+  }
+});
+
 }
