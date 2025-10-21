@@ -1,5 +1,3 @@
-import { apiRequest } from './queryClient';
-
 export interface AdminStats {
   totalUsers: number;
   totalRequests: number;
@@ -35,49 +33,40 @@ export interface LoginCredentials {
   password: string;
 }
 
-const defaultHeaders = {
+const API_BASE = 'https://astropeak.onrender.com';
+
+let adminHeaders: Record<string, string> = {
   'Content-Type': 'application/json',
 };
 
-// Use direct URL to backend server to avoid proxy issues
-const API_BASE = 'https://astropeak.onrender.com';
+// Call this after login to set headers for all admin requests
+export function setAdminCredentials(username: string, password: string) {
+  adminHeaders = {
+    'Content-Type': 'application/json',
+    username,
+    password,
+  };
+}
 
 export const adminApi = {
-  async login(credentials: LoginCredentials): Promise<{ message: string; success: boolean }> {
+  async login(credentials: LoginCredentials) {
     const response = await fetch(`${API_BASE}/api/admin/login`, {
       method: 'POST',
-      headers: defaultHeaders,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials),
-      credentials: 'include',
     });
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to login: ${errorText}`);
+    if (!response.ok) throw new Error('Login failed');
+    const data = await response.json();
+    if (data.success) {
+      // set headers for future requests
+      setAdminCredentials(credentials.username, credentials.password);
     }
-    return response.json();
-  },
-
-  async logout(): Promise<{ message: string }> {
-    const response = await fetch(`${API_BASE}/api/admin/logout`, {
-      method: 'POST',
-      headers: defaultHeaders,
-      credentials: 'include',
-    });
-    if (!response.ok) throw new Error('Failed to logout');
-    return response.json();
-  },
-
-  async checkStatus(): Promise<{ isAdmin: boolean }> {
-    const response = await fetch(`${API_BASE}/api/admin/status`, {
-      credentials: 'include',
-    });
-    if (!response.ok) throw new Error('Failed to check status');
-    return response.json();
+    return data;
   },
 
   async getStats(): Promise<AdminStats> {
     const response = await fetch(`${API_BASE}/api/admin/stats`, {
-      credentials: 'include',
+      headers: adminHeaders,
     });
     if (!response.ok) throw new Error('Failed to fetch stats');
     return response.json();
@@ -85,7 +74,7 @@ export const adminApi = {
 
   async getUsers(): Promise<User[]> {
     const response = await fetch(`${API_BASE}/api/admin/users`, {
-      credentials: 'include',
+      headers: adminHeaders,
     });
     if (!response.ok) throw new Error('Failed to fetch users');
     return response.json();
@@ -93,26 +82,25 @@ export const adminApi = {
 
   async getRequests(): Promise<ServiceRequest[]> {
     const response = await fetch(`${API_BASE}/api/admin/requests`, {
-      credentials: 'include',
+      headers: adminHeaders,
     });
     if (!response.ok) throw new Error('Failed to fetch requests');
     return response.json();
   },
 
-  async updateRequestStatus(id: number, status: 'queued' | 'fulfilled' | 'cancelled'): Promise<void> {
+  async updateRequestStatus(id: number, status: 'queued' | 'fulfilled' | 'cancelled') {
     const response = await fetch(`${API_BASE}/api/admin/requests/${id}/status`, {
       method: 'PATCH',
-      headers: defaultHeaders,
+      headers: adminHeaders,
       body: JSON.stringify({ status }),
-      credentials: 'include',
     });
     if (!response.ok) throw new Error('Failed to update request status');
   },
 
-  async deleteRequest(id: number): Promise<void> {
+  async deleteRequest(id: number) {
     const response = await fetch(`${API_BASE}/api/admin/requests/${id}`, {
       method: 'DELETE',
-      credentials: 'include',
+      headers: adminHeaders,
     });
     if (!response.ok) throw new Error('Failed to delete request');
   },
