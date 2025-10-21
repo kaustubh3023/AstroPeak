@@ -1,3 +1,5 @@
+// routes.ts
+
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./DB/client";
 import { users, serviceRequests, type User, type ServiceRequest } from "../shared/schema";
@@ -10,14 +12,14 @@ import {
   type ServiceFormData,
 } from "./emailService";
 
-// ===== ADMIN AUTH HEADERS =====
+// Admin credentials
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "neeraj";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
-// Admin-only actions — check credentials via headers
+// Custom headers authentication
 function simpleAdminAuth(req: Request, res: Response, next: NextFunction) {
-  const username = req.headers["username"] as string;
-  const password = req.headers["password"] as string;
+  const username = req.headers['x-admin-username'];
+  const password = req.headers['x-admin-password'];
 
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
     return next();
@@ -93,16 +95,13 @@ export async function registerRoutes(app: Express) {
       const existing = await db.select().from(users).where(eq(users.uid, uid)).limit(1);
       if (!existing.length) return res.status(404).json({ message: "User not found" });
 
-      await db
-        .update(users)
-        .set({
-          ...(name && { name }),
-          ...(gender && { gender }),
-          ...(age && { age }),
-          ...(dob && { dob }),
-          ...(zodiacSign && { zodiacSign }),
-        })
-        .where(eq(users.uid, uid));
+      await db.update(users).set({
+        ...(name && { name }),
+        ...(gender && { gender }),
+        ...(age && { age }),
+        ...(dob && { dob }),
+        ...(zodiacSign && { zodiacSign }),
+      }).where(eq(users.uid, uid));
 
       if (!existing[0].name && name && email) {
         await sendWelcomeEmail({ name, phone: existing[0].phone }, email);
@@ -150,33 +149,13 @@ export async function registerRoutes(app: Express) {
         createdAt: new Date(),
       });
 
-      sendServiceRequestEmail(data).catch(err => {
-        console.warn("⚠️ Email sending failed, booking is saved:", err);
-      });
+      sendServiceRequestEmail(data).catch(err => console.warn("Email failed:", err));
 
       res.status(201).json({ message: "Service booked successfully!", success: true });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Internal server error while processing service request" });
     }
-  });
-
-  // ===== ADMIN LOGIN =====
-  app.post("/api/admin/login", (req: Request, res: Response) => {
-    const { username, password } = req.body;
-
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      return res.json({
-        message: "Login successful",
-        success: true,
-        isAdmin: true,
-      });
-    }
-
-    res.status(401).json({
-      message: "Invalid credentials",
-      success: false,
-    });
   });
 
   // ===== ADMIN ROUTES =====
@@ -203,7 +182,7 @@ export async function registerRoutes(app: Express) {
   app.patch("/api/admin/requests/:id/status", simpleAdminAuth, async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status } = req.body;
-    if (!status || !["queued", "fulfilled", "cancelled"].includes(status))
+    if (!status || !['queued', 'fulfilled', 'cancelled'].includes(status))
       return res.status(400).json({ error: "Invalid status" });
 
     try {
@@ -218,13 +197,12 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // ===== ADMIN STATS =====
   app.get("/api/admin/stats", simpleAdminAuth, async (_req: Request, res: Response) => {
     try {
       const totalUsers = await db.select().from(users).execute();
       const totalRequests = await db.select().from(serviceRequests).execute();
-      const queuedRequests = await db.select().from(serviceRequests).where(eq(serviceRequests.status, "queued")).execute();
-      const fulfilledRequests = await db.select().from(serviceRequests).where(eq(serviceRequests.status, "fulfilled")).execute();
+      const queuedRequests = await db.select().from(serviceRequests).where(eq(serviceRequests.status, 'queued')).execute();
+      const fulfilledRequests = await db.select().from(serviceRequests).where(eq(serviceRequests.status, 'fulfilled')).execute();
 
       res.json({
         totalUsers: totalUsers.length,
@@ -236,5 +214,14 @@ export async function registerRoutes(app: Express) {
       console.error(err);
       res.status(500).json({ error: "Failed to fetch admin stats" });
     }
+  });
+
+  // ===== ADMIN LOGIN =====
+  app.post("/api/admin/login", (req: Request, res: Response) => {
+    const { username, password } = req.body;
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      return res.json({ message: "Login successful", success: true, isAdmin: true });
+    }
+    res.status(401).json({ message: "Invalid credentials", success: false });
   });
 }

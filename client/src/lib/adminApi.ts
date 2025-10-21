@@ -47,16 +47,16 @@ export function setAdminCredentials(username: string, password: string) {
   adminPassword = password;
 }
 
+// Headers for authenticated admin requests
 function getAdminHeaders() {
   return {
     'Content-Type': 'application/json',
-    username: adminUsername,
-    password: adminPassword,
+    'x-admin-username': adminUsername,
+    'x-admin-password': adminPassword,
   };
 }
 
 export const adminApi = {
-  // Admin login
   async login(credentials: LoginCredentials) {
     const res = await fetch(`${API_BASE}/api/admin/login`, {
       method: 'POST',
@@ -66,33 +66,29 @@ export const adminApi = {
 
     if (!res.ok) throw new Error('Login failed');
 
-    // Save credentials to use in future requests
+    // Save credentials
     setAdminCredentials(credentials.username, credentials.password);
     return res.json();
   },
 
-  // Get all users
   async getUsers(): Promise<User[]> {
     const res = await fetch(`${API_BASE}/api/admin/users`, { headers: getAdminHeaders() });
     if (!res.ok) throw new Error('Failed to fetch users');
     return res.json();
   },
 
-  // Get all service requests
   async getRequests(): Promise<ServiceRequest[]> {
     const res = await fetch(`${API_BASE}/api/admin/requests`, { headers: getAdminHeaders() });
     if (!res.ok) throw new Error('Failed to fetch requests');
     return res.json();
   },
 
-  // Get stats
   async getStats(): Promise<AdminStats> {
     const res = await fetch(`${API_BASE}/api/admin/stats`, { headers: getAdminHeaders() });
     if (!res.ok) throw new Error('Failed to fetch stats');
     return res.json();
   },
 
-  // Update request status
   async updateRequestStatus(id: number, status: 'queued' | 'fulfilled' | 'cancelled') {
     const res = await fetch(`${API_BASE}/api/admin/requests/${id}/status`, {
       method: 'PATCH',
@@ -102,7 +98,6 @@ export const adminApi = {
     if (!res.ok) throw new Error('Failed to update request status');
   },
 
-  // Delete request
   async deleteRequest(id: number) {
     const res = await fetch(`${API_BASE}/api/admin/requests/${id}`, {
       method: 'DELETE',
