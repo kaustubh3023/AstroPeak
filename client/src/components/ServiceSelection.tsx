@@ -13,6 +13,7 @@ import {
   BarChart3, Calculator, Smartphone, Type, CreditCard, 
   Edit, Clock, Coins, PenTool, ArrowLeft, X 
 } from 'lucide-react';
+import { useLocation } from 'wouter';
 
 const serviceFormSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -32,7 +33,9 @@ type ServiceFormData = z.infer<typeof serviceFormSchema>;
 export default function ServiceSelection() {
   const [selectedService, setSelectedService] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   const form = useForm<ServiceFormData>({
     resolver: zodResolver(serviceFormSchema),
@@ -66,12 +69,11 @@ export default function ServiceSelection() {
     }
   };
 
-  // ✅ UPDATED SUBMIT HANDLER WITH UID CHECK
   const onSubmit = async (data: ServiceFormData) => {
     setIsSubmitting(true);
 
     try {
-      const uid = localStorage.getItem('uid'); // ✅ Get UID from localStorage
+      const uid = localStorage.getItem('uid'); 
       if (!uid) {
         toast({
           title: "Login Required",
@@ -84,9 +86,8 @@ export default function ServiceSelection() {
 
       const serviceData = {
         ...data,
-        uid, // ✅ Include UID
+        uid,
         serviceName: selectedService?.name || 'Unknown Service',
-        
       };
 
       const response = await fetch('/api/service-request', {
@@ -120,6 +121,11 @@ export default function ServiceSelection() {
   };
 
   const handleServiceSelect = (service: any) => {
+    const uid = localStorage.getItem('uid');
+    if (!uid) {
+      setShowLoginPopup(true); // Show popup if not logged in
+      return;
+    }
     setSelectedService(service);
     form.reset();
   };
@@ -195,7 +201,6 @@ export default function ServiceSelection() {
                       <FormMessage />
                     </FormItem>
                   )} />
-
                   <FormField control={form.control} name="lastName" render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-black">Last Name *</FormLabel>
@@ -213,7 +218,6 @@ export default function ServiceSelection() {
                       <FormMessage />
                     </FormItem>
                   )} />
-
                   <FormField control={form.control} name="phone" render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-black">Phone *</FormLabel>
@@ -324,18 +328,18 @@ export default function ServiceSelection() {
             <div
               key={service.id}
               onClick={() => handleServiceSelect(service)}
-              className="cursor-pointer p-8 rounded-2xl border border-gray-200 hover:border-yellow-500 shadow-sm hover:shadow-md transition-all duration-500 group bg-white pointer-events-auto relative z-20"
+              className="cursor-pointer p-8 rounded-2xl border border-gray-200 shadow-sm bg-white pointer-events-auto relative z-20"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="text-center space-y-6">
-                <div className="w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto">
                   <div style={{ color: 'hsl(216, 47%, 8%)' }}>{getIcon(service.icon)}</div>
                 </div>
                 <h3 className="text-2xl font-display font-semibold text-gray-900">{service.name}</h3>
                 <p className="text-gray-600 leading-relaxed">{service.description}</p>
                 <span className="font-semibold text-gray-700">{service.price}</span>
                 <div className="pt-4">
-                  <span className="text-sm text-gray-500 group-hover:text-gray-900 transition-colors duration-300">
+                  <span className="text-sm text-gray-500">
                     Click to Book →
                   </span>
                 </div>
@@ -344,6 +348,38 @@ export default function ServiceSelection() {
           ))}
         </div>
       </div>
+
+      {/* LOGIN POPUP */}
+      {showLoginPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-auto p-6 flex flex-col space-y-6">
+            <div className="flex flex-col space-y-4">
+              <h3 className="text-2xl font-bold text-gray-900">Login Required</h3>
+              <p className="text-gray-700 text-base">
+                You need to log in to continue with the service booking.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 mt-2 w-full">
+              <Button
+                onClick={() => {
+                  setShowLoginPopup(false);
+                  navigate('/login');
+                }}
+                className="bg-yellow-500 text-black w-full sm:w-auto py-3 px-6 font-semibold rounded-lg"
+              >
+                Login Now
+              </Button>
+              <Button
+                onClick={() => setShowLoginPopup(false)}
+                variant="outline"
+                className="border-gray-300 text-gray-700 w-full sm:w-auto py-3 px-6 font-semibold rounded-lg"
+              >
+                Later
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

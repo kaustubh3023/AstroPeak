@@ -17,7 +17,7 @@ const firebaseConfig = {
   projectId: "shrisheeastro",
   storageBucket: "shrisheeastro.appspot.com",
   messagingSenderId: "630960074300",
-  appId: "1:630960074300:web:YOUR_REAL_APP_ID_HERE" // ⚠️ Replace with your real App ID from Firebase Console
+  appId: "1:630960074300:web:YOUR_REAL_APP_ID_HERE" 
 };
 
 // ✅ Initialize Firebase

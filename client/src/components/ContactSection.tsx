@@ -99,7 +99,7 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <h4 className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Phone Consultation</h4>
-                    <p className="text-gray-300">+91 98765 43210</p>
+                    <p className="text-gray-300">+91 9105029933</p>
                   </div>
                 </div>
               </div>
@@ -111,7 +111,8 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <h4 className="font-semibold" style={{ color: 'hsl(43, 74%, 52%)' }}>Email</h4>
-                    <p className="text-gray-300">info@shrishrreeastro.com</p>
+                    <p className="text-gray-300">shrishrree@gmail.com
+</p>
                   </div>
                 </div>
               </div>

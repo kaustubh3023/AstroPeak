@@ -66,9 +66,9 @@ const Login: React.FC = () => {
       const result = await signInWithPhoneNumber(auth, fullPhone, window.recaptchaVerifier);
       setConfirmationResult(result);
       setStep("otp");
-      console.log("✅ OTP sent successfully");
+      console.log(" OTP sent successfully");
     } catch (err: any) {
-      console.error("❌ OTP sending failed:", err);
+      console.error(" OTP sending failed:", err);
       console.error("Error code:", err.code);
       console.error("Error message:", err.message);
       
@@ -121,10 +121,10 @@ const Login: React.FC = () => {
 
         if (response.ok) {
           if (result.message === "User exists") {
-            setStatusMessage("Welcome back! Redirecting to home page...");
+            setStatusMessage("Welcome back!");
             setTimeout(() => navigate("/"), 1000); // Redirect existing users to home page
           } else if (result.message === "User created") {
-            setStatusMessage("Account created! Redirecting to complete your profile...");
+            setStatusMessage("Account created!");
             setTimeout(() => navigate("/details"), 1000); // Redirect new users to details form
           } else {
             // Fallback for any other successful response
